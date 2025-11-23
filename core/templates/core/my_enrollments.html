@@ -1,0 +1,77 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Mis Inscripciones</h2>
+
+    {% if enrollments %}
+    <div class="row">
+        {% for enrollment in enrollments %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ enrollment.course.code }} - {{ enrollment.course.name }}</h5>
+                    <p class="card-text">{{ enrollment.course.description|truncatewords:15 }}</p>
+                    <ul class="list-unstyled">
+                        <li><strong>Profesor:</strong> {{ enrollment.course.professor.get_full_name }}</li>
+                        <li><strong>Créditos:</strong> {{ enrollment.course.credits }}</li>
+                        <li><strong>Horario:</strong> {{ enrollment.course.schedule }}</li>
+                        <li><strong>Estado:</strong> 
+                            <span class="badge 
+                                {% if enrollment.status == 'confirmed' %}bg-success
+                                {% elif enrollment.status == 'pending' %}bg-warning
+                                {% else %}bg-danger{% endif %}">
+                                {{ enrollment.get_status_display }}
+                            </span>
+                        </li>
+                        <li><strong>Fecha de inscripción:</strong> {{ enrollment.created_at|date:"d/m/Y" }}</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if enrollment.status == 'pending' %}
+                            <a href="{% url 'payment_page' enrollment.id %}" class="btn btn-success btn-sm">💳 Pagar</a>
+                            <form method="post" action="{% url 'cancel_enrollment' enrollment.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('¿Estás seguro de cancelar esta inscripción?')">
+                                    ❌ Cancelar
+                                </button>
+                            </form>
+                        {% elif enrollment.status == 'confirmed' %}
+                            <span class="text-success">✅ Inscripción confirmada</span>
+                            <form method="post" action="{% url 'cancel_enrollment' enrollment.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                        onclick="return confirm('¿Estás seguro de cancelar esta inscripción? Se liberará tu cupo.')">
+                                    Cancelar
+                                </button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted">📝 Inscripción cancelada</span>
+                            <a href="{% url 'course_detail' enrollment.course.id %}" class="btn btn-primary btn-sm">
+                                🔄 Volver a inscribirse
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <h4>📚 No tienes inscripciones</h4>
+        <p class="mb-3">Explora nuestros cursos disponibles y realiza tu primera inscripción.</p>
+        <a href="{% url 'course_list' %}" class="btn btn-primary btn-lg">Ver Cursos Disponibles</a>
+    </div>
+    {% endif %}
+
+    <!-- Botón para volver a cursos -->
+    <div class="mt-4 text-center">
+        <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
+            ← Volver a todos los cursos
+        </a>
+    </div>
+</div>
+{% endblock %}

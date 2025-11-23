@@ -1,0 +1,59 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 mb-4" style="color: var(--primary-color);">
+            Bienvenido a la Plataforma de Inscripción Universitaria
+        </h1>
+        <p class="lead mb-4">
+            Gestiona tus cursos, inscripciones y pagos de manera fácil y segura.
+        </p>
+        
+        {% if not user.is_authenticated %}
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 gap-3">
+                Crear Cuenta
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg px-4">
+                Iniciar Sesión
+            </a>
+        </div>
+        {% else %}
+        <div class="row mt-5">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">📚 Cursos Disponibles</h5>
+                        <p class="card-text">Explora nuestra oferta académica</p>
+                        <a href="{% url 'course_list' %}" class="btn btn-primary">Ver Cursos</a>
+                    </div>
+                </div>
+            </div>
+            
+            {% if user.profile.role == 'student' %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🎓 Mis Inscripciones</h5>
+                        <p class="card-text">Gestiona tus cursos inscritos</p>
+                        <a href="{% url 'my_enrollments' %}" class="btn btn-primary">Ver Inscripciones</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">🔔 Notificaciones</h5>
+                        <p class="card-text">Mantente informado</p>
+                        <a href="{% url 'notifications' %}" class="btn btn-primary">Ver Notificaciones</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

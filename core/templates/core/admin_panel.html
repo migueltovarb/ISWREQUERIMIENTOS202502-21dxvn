@@ -1,0 +1,96 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Panel de Administración</h2>
+        
+        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card text-white text-center p-3 rounded" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <h4>{{ total_courses }}</h4>
+                    <p>Cursos Totales</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-white text-center p-3 rounded" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                    <h4>{{ total_students }}</h4>
+                    <p>Estudiantes</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-white text-center p-3 rounded" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                    <h4>{{ total_professors }}</h4>
+                    <p>Profesores</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-white text-center p-3 rounded" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                    <h4>{{ total_enrollments }}</h4>
+                    <p>Inscripciones</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Acciones Rápidas</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'manage_courses' %}" class="btn btn-primary me-2">Gestionar Cursos</a>
+                        <a href="{% url 'generate_reports' %}?type=enrollments" class="btn btn-success me-2">Descargar Reporte</a>
+                        <a href="/admin/" class="btn btn-secondary">Admin Django</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inscripciones recientes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Inscripciones Recientes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_enrollments %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Estudiante</th>
+                                        <th>Curso</th>
+                                        <th>Estado</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for enrollment in recent_enrollments %}
+                                    <tr>
+                                        <td>{{ enrollment.student.get_full_name }}</td>
+                                        <td>{{ enrollment.course.code }}</td>
+                                        <td>
+                                            <span class="badge {% if enrollment.status == 'confirmed' %}bg-success{% else %}bg-warning{% endif %}">
+                                                {{ enrollment.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ enrollment.created_at|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No hay inscripciones recientes.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

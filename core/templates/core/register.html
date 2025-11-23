@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Crear Cuenta</h4>
+            </div>
+            <div class="card-body">
+                <!-- Mostrar errores -->
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>Errores encontrados:</strong>
+                    <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label">Nombre *</label>
+                            <input type="text" name="first_name" class="form-control" required id="id_first_name" value="{{ form.first_name.value|default:'' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label">Apellido *</label>
+                            <input type="text" name="last_name" class="form-control" required id="id_last_name" value="{{ form.last_name.value|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Usuario *</label>
+                        <input type="text" name="username" class="form-control" required id="id_username" value="{{ form.username.value|default:'' }}">
+                        <div class="form-text">Requerido. 150 carácteres como máximo. Únicamente letras, dígitos y @/./+/-/_</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email *</label>
+                        <input type="email" name="email" class="form-control" required id="id_email" value="{{ form.email.value|default:'' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_role" class="form-label">Rol *</label>
+                        <select name="role" class="form-select" required id="id_role">
+                            <option value="">Selecciona un rol</option>
+                            <option value="student" {% if form.role.value == 'student' %}selected{% endif %}>Estudiante</option>
+                            <option value="professor" {% if form.role.value == 'professor' %}selected{% endif %}>Profesor</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_programa" class="form-label">Programa</label>
+                        <input type="text" name="programa" class="form-control" id="id_programa" value="{{ form.programa.value|default:'' }}" placeholder="Ej: Ingeniería de Sistemas">
+                    </div>
+                    
+                    <div class="mb-3" id="semestre-field">
+                        <label for="id_semestre" class="form-label">Semestre</label>
+                        <input type="number" name="semestre" class="form-control" min="1" max="10" id="id_semestre" value="{{ form.semestre.value|default:'' }}" placeholder="Ej: 5">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password1" class="form-label">Contraseña *</label>
+                        <input type="password" name="password1" class="form-control" required id="id_password1">
+                        <div class="form-text">
+                            <ul>
+                                <li>Tu contraseña no puede ser demasiado similar a tu otra información personal.</li>
+                                <li>Tu contraseña debe contener al menos 8 caracteres.</li>
+                                <li>Tu contraseña no puede ser una contraseña de uso común.</li>
+                                <li>Tu contraseña no puede ser completamente numérica.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password2" class="form-label">Confirmar Contraseña *</label>
+                        <input type="password" name="password2" class="form-control" required id="id_password2">
+                        <div class="form-text">Introduce la misma contraseña que antes, para verificación.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">🎓 Registrarse</button>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <p>¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mostrar/ocultar campo semestre según rol
+    function toggleSemestreField() {
+        const semestreField = document.getElementById('semestre-field');
+        const roleSelect = document.getElementById('id_role');
+        
+        if (roleSelect.value === 'student') {
+            semestreField.style.display = 'block';
+        } else {
+            semestreField.style.display = 'none';
+        }
+    }
+    
+    // Ejecutar al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleSemestreField();
+        
+        // Ejecutar cuando cambie el rol
+        document.getElementById('id_role').addEventListener('change', toggleSemestreField);
+    });
+</script>
+
+<style>
+    #semestre-field {
+        display: none;
+    }
+    
+    .form-text ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+    
+    .form-text li {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}

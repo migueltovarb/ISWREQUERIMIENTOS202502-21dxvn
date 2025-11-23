@@ -1,0 +1,72 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Procesar Pago</h4>
+            </div>
+            <div class="card-body">
+                <!-- Información del curso -->
+                <div class="alert alert-info">
+                    <h5>Resumen de la inscripción</h5>
+                    <p><strong>Curso:</strong> {{ enrollment.course.code }} - {{ enrollment.course.name }}</p>
+                    <p><strong>Créditos:</strong> {{ enrollment.course.credits }}</p>
+                    <p><strong>Valor por crédito:</strong> $100,000</p>
+                    <p><strong>Total a pagar:</strong> ${{ enrollment.course.credits|add:0|mul:100000|floatformat:0 }}</p>
+                </div>
+
+                {% if payment and payment.status == 'completed' %}
+                <div class="alert alert-success">
+                    <h5>✅ Pago ya procesado</h5>
+                    <p>Tu pago fue procesado exitosamente el {{ payment.created_at|date:"d/m/Y" }}.</p>
+                    <p><strong>Número de transacción:</strong> {{ payment.transaction_id }}</p>
+                    <a href="{% url 'my_enrollments' %}" class="btn btn-success">Volver a mis inscripciones</a>
+                </div>
+                {% else %}
+                <!-- Formulario de pago simulado -->
+                <form method="post" action="{% url 'process_payment' enrollment.id %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <h5>Método de pago</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="pse" value="pse" checked>
+                            <label class="form-check-label" for="pse">
+                                💳 PSE (Pagos Seguros en Línea)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="credit_card" value="credit_card">
+                            <label class="form-check-label" for="credit_card">
+                                💳 Tarjeta de Crédito
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="debit_card" value="debit_card">
+                            <label class="form-check-label" for="debit_card">
+                                💳 Tarjeta de Débito
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Información de pago simulada -->
+                    <div class="alert alert-warning">
+                        <h6>⚠️ Simulación de Pago</h6>
+                        <p class="mb-0">Este es un entorno de prueba. No se realizarán cargos reales.</p>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            💳 Procesar Pago de ${{ enrollment.course.credits|add:0|mul:100000|floatformat:0 }}
+                        </button>
+                        <a href="{% url 'my_enrollments' %}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

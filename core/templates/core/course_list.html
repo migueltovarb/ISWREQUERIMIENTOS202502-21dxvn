@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Cursos Disponibles</h2>
+    <form method="get" class="d-flex">
+        <input type="text" name="q" class="form-control me-2" placeholder="Buscar cursos..." value="{{ query }}">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+</div>
+
+<div class="row">
+    {% for course in courses %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ course.code }} - {{ course.name }}</h5>
+                <p class="card-text">{{ course.description|truncatewords:20 }}</p>
+                <ul class="list-unstyled">
+                    <li><strong>Profesor:</strong> {{ course.professor.get_full_name }}</li>
+                    <li><strong>Créditos:</strong> {{ course.credits }}</li>
+                    <li><strong>Horario:</strong> {{ course.schedule }}</li>
+                    <li><strong>Cupos disponibles:</strong> {{ course.available_spots }}/{{ course.capacity }}</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">Ver Detalles</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No se encontraron cursos.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ course.code }} - {{ course.name }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Descripción:</strong> {{ course.description }}</p>
+                <ul class="list-unstyled">
+                    <li><strong>Profesor:</strong> {{ course.professor.get_full_name }}</li>
+                    <li><strong>Créditos:</strong> {{ course.credits }}</li>
+                    <li><strong>Horario:</strong> {{ course.schedule }}</li>
+                    <li><strong>Cupos disponibles:</strong> {{ course.available_spots }}/{{ course.capacity }}</li>
+                </ul>
+                
+                {% if user.is_authenticated and user.profile.role == 'student' %}
+                    {% if is_enrolled and enrollment.status != 'cancelled' %}
+                        <div class="alert alert-info">
+                            ✅ Ya estás inscrito en este curso.
+                            <a href="{% url 'my_enrollments' %}" class="alert-link">Ver mis inscripciones</a>
+                        </div>
+                    {% else %}
+                        {% if course.available_spots > 0 %}
+                            <form method="post" action="{% url 'enroll_course' course.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">🎓 Inscribirse en este curso</button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                ❌ No hay cupos disponibles para este curso.
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% elif not user.is_authenticated %}
+                    <div class="alert alert-warning">
+                        🔒 <a href="{% url 'login' %}">Inicia sesión</a> para inscribirte en este curso.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Información adicional -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Información del Curso</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Estado:</strong>
+                    {% if course.available_spots > 0 %}
+                        <span class="badge bg-success">Disponible</span>
+                    {% else %}
+                        <span class="badge bg-danger">Lleno</span>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <strong>Costo estimado:</strong><br>
+                    ${{ course.credits|mul:100000|floatformat:0 }}
+                </div>
+                <div class="mb-3">
+                    <strong>Profesor:</strong><br>
+                    {{ course.professor.get_full_name }}<br>
+                    <small class="text-muted">{{ course.professor.email }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'course_list' %}" class="btn btn-secondary">← Volver a todos los cursos</a>
+</div>
+{% endblock %}
